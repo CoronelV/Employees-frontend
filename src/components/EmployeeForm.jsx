@@ -1,16 +1,14 @@
 import React, { useState } from 'react'
-import { Form, Input, InputNumber, Button } from 'antd'
+import { Form, Input, InputNumber, Button, AutoComplete } from 'antd'
 import { validateEmployeeForm } from '../utils/validation'
 
-function EmployeeForm({ onSubmit, loading }) {
+function EmployeeForm({ onSubmit, loading, departments = [] }) {
   const [form] = Form.useForm()
   const [errors, setErrors] = useState({})
 
   const handleSubmit = () => {
     const values = form.getFieldsValue()
     const validationErrors = validateEmployeeForm(values)
-
-    console.log('values', values)
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors)
@@ -100,7 +98,14 @@ function EmployeeForm({ onSubmit, loading }) {
         validateStatus={errors.department ? 'error' : ''}
         help={errors.department}
       >
-        <Input placeholder="Ingrese el departamento" />
+        <AutoComplete
+          placeholder="Seleccione o escriba un departamento para crear uno nuevo"
+          options={departments.map((dept) => ({ value: dept }))}
+          filterOption={(inputValue, option) =>
+            option.value.toLowerCase().includes(inputValue.toLowerCase())
+          }
+          allowClear
+        />
       </Form.Item>
 
       <Form.Item

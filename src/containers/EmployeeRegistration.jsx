@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Card } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import EmployeeForm from '../components/EmployeeForm'
@@ -9,7 +9,26 @@ import { useNotification } from '../context/NotificationContext'
 function EmployeeRegistration() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
+  const [departments, setDepartments] = useState([])
   const { showLoading, showSuccess, showError, hideNotification } = useNotification()
+
+  const loadDepartments = useCallback(async () => {
+    try {
+      const data = await employeeService.getAllDepartments()
+      if (Array.isArray(data)) {
+        setDepartments(data)
+      } else {
+        setDepartments([])
+      }
+    } catch (error) {
+      console.error('Error loading departments:', error)
+      setDepartments([])
+    }
+  }, [])
+
+  useEffect(() => {
+    loadDepartments()
+  }, [loadDepartments])
 
   const handleSubmit = async (values) => {
     console.log(values)
@@ -50,7 +69,7 @@ function EmployeeRegistration() {
 
   return (
     <Card title="Registro de Nuevo Empleado">
-      <EmployeeForm onSubmit={handleSubmit} loading={loading} />
+      <EmployeeForm onSubmit={handleSubmit} loading={loading} departments={departments} />
     </Card>
   )
 }
